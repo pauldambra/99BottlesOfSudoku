@@ -13,6 +13,7 @@ public class Sudoku2By2Test extends SudokuTest {
     @TestFactory
     List<DynamicTest> sudokuTests() {
         return asList(
+                // Already solved
                 dynamicTest("Solving an already solved puzzle makes no changes", () -> sudokuTest(
                         "1 2",  "1 2",
                         "2 1",  "2 1"))
@@ -20,7 +21,7 @@ public class Sudoku2By2Test extends SudokuTest {
 //                        "2 1",  "2 1",
 //                        "1 2",  "1 2"))
 //
-//
+                // One cell missing
 //                ,dynamicTest("Top Left Missing", () -> sudokuTest(
 //                        "0 2",  "1 2",
 //                        "2 1",  "2 1"))
@@ -49,7 +50,7 @@ public class Sudoku2By2Test extends SudokuTest {
 //                        "2 1",  "2 1",
 //                        "0 2",  "1 2"))
 //
-//
+                // Two cells missing
 //                ,dynamicTest("Top Row Missing", () -> sudokuTest(
 //                        "0 0",  "1 2",
 //                        "2 1",  "2 1"))
@@ -78,7 +79,7 @@ public class Sudoku2By2Test extends SudokuTest {
 //                        "0 1",  "2 1",
 //                        "0 2",  "1 2"))
 //
-//
+                // Three cells missing
 //                ,dynamicTest("Top Left only present", () -> sudokuTest(
 //                        "1 0",  "1 2",
 //                        "0 0",  "2 1"))
