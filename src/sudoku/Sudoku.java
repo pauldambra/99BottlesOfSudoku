@@ -1,5 +1,7 @@
 package sudoku;
 
+import javafx.scene.control.Cell;
+
 import java.util.Arrays;
 
 // if a cell is not set
@@ -12,60 +14,84 @@ import java.util.Arrays;
 // the concepts are missing from the code entirely
 public class Sudoku {
 
-    private boolean isSet(int[][] puzzle, int row, int column) {  return puzzle[row][column] != 0;  }
+    class CellWithinPuzzle {
+        private final int[][] puzzle;
+        private final int row;
+        private final int column;
 
-    private int[] neighbours(int[][] puzzle, int row, int column) {
-        return new int[] { puzzle[1-row][column], puzzle[row][1-column] };
-    }
+        CellWithinPuzzle(int[][] puzzle, int row, int column) {
+            this.puzzle = puzzle;
+            this.row = row;
+            this.column = column;
+        }
 
-    private boolean neighboursAre(int value, int[][] puzzle, int row, int column) {
-        int[] neighbours = neighbours(puzzle, row, column);
-        return Arrays.stream(neighbours).anyMatch(n -> n == value);
+        boolean isSet() {
+            return puzzle[row][column] != 0;
+        }
+
+        private int[] neighbours(int[][] puzzle, int row, int column) {
+            return new int[] { puzzle[1-row][column], puzzle[row][1-column] };
+        }
+
+        boolean neighboursAre(int value) {
+            int[] neighbours = neighbours(puzzle, row, column);
+            return Arrays.stream(neighbours).anyMatch(n -> n == value);
+        }
+
+        int[][] setCell(int value) {
+            int[][] puzzleCopy = Arrays.stream(puzzle).map(int[]::clone).toArray(int[][]::new);
+            puzzleCopy[row][column] = value;
+            return puzzleCopy;
+        }
     }
 
     public int[][] solve(int[][] puzzle) {
 
-        if (!isSet(puzzle, 1, 1)) {
-            if (neighboursAre(2, puzzle, 1, 1)) {
-                puzzle[1][1] = 1;
+        CellWithinPuzzle bottomRight = new CellWithinPuzzle(puzzle, 1, 1);
+        if (!bottomRight.isSet()) {
+            if (bottomRight.neighboursAre(2)) {
+                puzzle = bottomRight.setCell(1);
                 return solve(puzzle);
             }
 
-            if (neighboursAre(1, puzzle, 1, 1)){
-                puzzle[1][1] = 2;
+            if (bottomRight.neighboursAre(1)){
+                puzzle = bottomRight.setCell(2);
                 return solve(puzzle);
             }
         }
 
-        if (!isSet(puzzle, 1, 0)) {
-            if (puzzle[1][1] == 2 || puzzle[0][0] == 2) {
-                puzzle[1][0] = 1;
+        CellWithinPuzzle bottomLeft = new CellWithinPuzzle(puzzle, 1, 0);
+        if (!bottomLeft.isSet()) {
+            if (bottomLeft.neighboursAre(2)) {
+                puzzle = bottomLeft.setCell(1);
                 return solve(puzzle);
             }
-            if (puzzle[1][1] == 1 || puzzle[0][0] == 1) {
-                puzzle[1][0] = 2;
-                return solve(puzzle);
-            }
-        }
-
-        if (!isSet(puzzle, 0, 1)) {
-            if (puzzle[0][0] == 2 || puzzle[1][1] == 2) {
-                puzzle[0][1] = 1;
-                return solve(puzzle);
-            }
-            if (puzzle[0][0] == 1 || puzzle[1][1] == 1){
-                puzzle[0][1] = 2;
+            if (bottomLeft.neighboursAre(1)) {
+                puzzle = bottomLeft.setCell(2);
                 return solve(puzzle);
             }
         }
 
-        if (!isSet(puzzle, 0, 0)) {
-            if (puzzle[0][1] == 2 || puzzle[1][0] == 2) {
-                puzzle[0][0] = 1;
+        CellWithinPuzzle topRight = new CellWithinPuzzle(puzzle, 0, 1);
+        if (!topRight.isSet()) {
+            if (topRight.neighboursAre(2)) {
+                puzzle = topRight.setCell(1);
                 return solve(puzzle);
             }
-            if (puzzle[0][1] == 1 || puzzle[1][0] == 1) {
-                puzzle[0][0] = 2;
+            if (topRight.neighboursAre(1)){
+                puzzle = topRight.setCell(2);
+                return solve(puzzle);
+            }
+        }
+
+        CellWithinPuzzle topLeft = new CellWithinPuzzle(puzzle, 0, 0);
+        if (!topLeft.isSet()) {
+            if (topLeft.neighboursAre(2)) {
+                puzzle = topLeft.setCell(1);
+                return solve(puzzle);
+            }
+            if (topLeft.neighboursAre(1)) {
+                puzzle = topLeft.setCell(2);
                 return solve(puzzle);
             }
         }
