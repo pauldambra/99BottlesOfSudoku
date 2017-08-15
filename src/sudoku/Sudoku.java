@@ -1,7 +1,5 @@
 package sudoku;
 
-import javafx.scene.control.Cell;
-
 import java.util.Arrays;
 
 // if a cell is not set
@@ -30,7 +28,7 @@ public class Sudoku {
         }
 
         private int[] neighbours(int[][] puzzle, int row, int column) {
-            return new int[] { puzzle[1-row][column], puzzle[row][1-column] };
+            return new int[]{puzzle[1 - row][column], puzzle[row][1 - column]};
         }
 
         boolean neighboursAre(int value) {
@@ -43,56 +41,38 @@ public class Sudoku {
             puzzleCopy[row][column] = value;
             return puzzleCopy;
         }
+
+        SolutionAttemptResult trySolve() {
+            if (isSet()) return new SolutionAttemptResult(false, puzzle);
+
+            if (neighboursAre(2)) return new SolutionAttemptResult(true, setCell(1));
+
+            if (neighboursAre(1)) return new SolutionAttemptResult(true, setCell(2));
+
+            return new SolutionAttemptResult(false, puzzle);
+        }
     }
 
-    public int[][] solve(int[][] puzzle) {
+    class SolutionAttemptResult {
+        private final boolean didChangeCell;
+        private final int[][] puzzle;
 
-        CellWithinPuzzle bottomRight = new CellWithinPuzzle(puzzle, 1, 1);
-        if (!bottomRight.isSet()) {
-            if (bottomRight.neighboursAre(2)) {
-                puzzle = bottomRight.setCell(1);
-                return solve(puzzle);
-            }
-
-            if (bottomRight.neighboursAre(1)){
-                puzzle = bottomRight.setCell(2);
-                return solve(puzzle);
-            }
+        SolutionAttemptResult(boolean didChangeCell, int[][] puzzle) {
+            this.didChangeCell = didChangeCell;
+            this.puzzle = puzzle;
         }
+    }
 
-        CellWithinPuzzle bottomLeft = new CellWithinPuzzle(puzzle, 1, 0);
-        if (!bottomLeft.isSet()) {
-            if (bottomLeft.neighboursAre(2)) {
-                puzzle = bottomLeft.setCell(1);
-                return solve(puzzle);
-            }
-            if (bottomLeft.neighboursAre(1)) {
-                puzzle = bottomLeft.setCell(2);
-                return solve(puzzle);
-            }
-        }
+    private int[][] solve(int[][] puzzle) {
 
-        CellWithinPuzzle topRight = new CellWithinPuzzle(puzzle, 0, 1);
-        if (!topRight.isSet()) {
-            if (topRight.neighboursAre(2)) {
-                puzzle = topRight.setCell(1);
-                return solve(puzzle);
-            }
-            if (topRight.neighboursAre(1)){
-                puzzle = topRight.setCell(2);
-                return solve(puzzle);
-            }
-        }
+        int squareMax = 1;
 
-        CellWithinPuzzle topLeft = new CellWithinPuzzle(puzzle, 0, 0);
-        if (!topLeft.isSet()) {
-            if (topLeft.neighboursAre(2)) {
-                puzzle = topLeft.setCell(1);
-                return solve(puzzle);
-            }
-            if (topLeft.neighboursAre(1)) {
-                puzzle = topLeft.setCell(2);
-                return solve(puzzle);
+        for (int row = 0; row <= squareMax; row++) {
+            for (int column = 0; column <= squareMax; column++) {
+                SolutionAttemptResult cellResult = new CellWithinPuzzle(puzzle, row, column).trySolve();
+                if (cellResult.didChangeCell) {
+                    return solve(cellResult.puzzle);
+                }
             }
         }
 
